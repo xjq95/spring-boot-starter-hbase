@@ -1,0 +1,144 @@
+package com.github.xjq95.springboot.starter.hbase;
+
+import java.util.List;
+
+import org.apache.hadoop.hbase.client.Mutation;
+import org.apache.hadoop.hbase.client.Scan;
+
+public interface HbaseOperations {
+
+    /**
+     * Executes the given action against the specified table handling resource management.
+     * <p>
+     * Application exceptions thrown by the action object get propagated to the caller (can only be unchecked).
+     * Allows for returning a result object (typically a domain object or collection of domain objects).
+     *
+     * @param tableName the target table
+     * @param <T>       action type
+     * @return the result object of the callback action, or null
+     */
+    <T> T execute(String tableName, TableCallback<T> mapper) throws Throwable;
+
+    /**
+     * Scans the target table, using the given column family.
+     * The content is processed row by row by the given action, returning a list of domain objects.
+     *
+     * @param tableName target table
+     * @param family    column family
+     * @param <T>       action type
+     * @return a list of objects mapping the scanned rows
+     */
+    <T> List<T> find(String tableName, String family, final RowMapper<T> mapper) throws Throwable;
+
+    /**
+     * Scans the target table, using the given column family.
+     * The content is processed row by row by the given action, returning a list of domain objects.
+     *
+     * @param tableName target table
+     * @param family    column family
+     * @param qualifier column qualifier
+     * @param <T>       action type
+     * @return a list of objects mapping the scanned rows
+     */
+    <T> List<T> find(String tableName, String family, String qualifier, final RowMapper<T> mapper) throws Throwable;
+
+    /**
+     * Scans the target table using the given {@link Scan} object. Suitable for maximum control over the scanning
+     * process.
+     * The content is processed row by row by the given action, returning a list of domain objects.
+     *
+     * @param tableName target table
+     * @param scan      table scanner
+     * @param <T>       action type
+     * @return a list of objects mapping the scanned rows
+     */
+    <T> List<T> find(String tableName, final Scan scan, final RowMapper<T> mapper) throws Throwable;
+
+    /**
+     * Gets an individual row from the given table. The content is mapped by the given action.
+     *
+     * @param tableName target table
+     * @param rowName   row name
+     * @param mapper    row mapper
+     * @param <T>       mapper type
+     * @return object mapping the target row
+     */
+    <T> T get(String tableName, String rowName, final RowMapper<T> mapper) throws Throwable;
+
+    /**
+     * Gets an individual row from the given table. The content is mapped by the given action.
+     *
+     * @param tableName  target table
+     * @param rowName    row name
+     * @param familyName column family
+     * @param mapper     row mapper
+     * @param <T>        mapper type
+     * @return object mapping the target row
+     */
+    <T> T get(String tableName, String rowName, String familyName, final RowMapper<T> mapper) throws Throwable;
+
+    /**
+     * Gets an individual row from the given table. The content is mapped by the given action.
+     *
+     * @param tableName  target table
+     * @param rowName    row name
+     * @param familyName family
+     * @param qualifier  column qualifier
+     * @param mapper     row mapper
+     * @param <T>        mapper type
+     * @return object mapping the target row
+     */
+    <T> T get(String tableName, final String rowName, final String familyName, final String qualifier, final RowMapper<T> mapper) throws Throwable;
+
+    /**
+     * 执行put update or delete
+     *
+     * @param tableName
+     * @param action
+     */
+    void execute(String tableName, MutatorCallback action) throws Throwable;
+
+    /**
+     * @param tableName
+     * @param mutation
+     */
+    void saveOrUpdate(String tableName, Mutation mutation) throws Throwable;
+
+    /**
+     * @param tableName
+     * @param mutations
+     */
+    void saveOrUpdates(String tableName, List<Mutation> mutations) throws Throwable;
+
+    /**
+     * Puts a single value in to the given table.
+     *
+     * @param tableName  target table
+     * @param rowName    row name
+     * @param familyName family
+     * @param qualifier  column qualifier
+     * @param data       the byte array of the data value to be put
+     */
+    void put(String tableName, final String rowName, final String familyName, final String qualifier, final byte[] data) throws Throwable;
+
+    /**
+     * Deletes a single qualifier in the given table and family.
+     *
+     * @param tableName  target table
+     * @param rowName    row name
+     * @param familyName family
+     */
+    void delete(String tableName, final String rowName, final String familyName) throws Throwable;
+
+    /**
+     * Deletes a single cell in the given table.
+     *
+     * @param tableName  target table
+     * @param rowName    row name
+     * @param familyName family
+     * @param qualifier  column qualifier
+     */
+    void delete(String tableName, final String rowName, final String familyName, final String qualifier) throws Throwable;
+}
+
+
